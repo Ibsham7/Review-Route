@@ -12,8 +12,8 @@ import { SplashScreen } from "./components/SplashScreen";
 import { auth, firebaseSignOut } from "./lib/firebase";
 
 function AppContent() {
-  const { user, loading: authLoading } = useAuth();
   const [splashDone, setSplashDone] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const [view, setView] = useState<ViewKey>("simulator");
   const [request, setRequest] = useState<SimulatorRequest | null>(null);
   const [result, setResult] = useState<InferenceResult | null>(null);
