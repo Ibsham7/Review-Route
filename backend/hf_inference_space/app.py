@@ -101,6 +101,10 @@ def predict(req: InferenceRequest):
             models=MODELS,
             review_title=req.review_title,
         )
+        # Attach original input fields for clarity in the API response
+        if isinstance(result, dict):
+            result["category"] = req.product_category
+            result["review_text"] = req.review_body
         return result
     except Exception as exc:
         log.exception("Inference error")
@@ -115,6 +119,16 @@ def predict_batch(reqs: list[InferenceRequest]):
         # Convert Pydantic models to dicts for the engine
         batch_data = [r.model_dump() for r in reqs]
         results = run_batch_inference(batch_data, MODELS)
+        # Ensure each returned result includes the original category and review text
+        for i, res in enumerate(results):
+            try:
+                if isinstance(res, dict):
+                    res["category"] = reqs[i].product_category
+                    res["review_text"] = reqs[i].review_body
+            except Exception:
+                # If anything unexpected happens, skip attaching for that item
+                continue
+
         return results
     except Exception as exc:
         log.exception("Batch inference error")
